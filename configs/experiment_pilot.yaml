@@ -1,0 +1,95 @@
+experiment:
+  name: "pilot_cpi_nowcast_1month"
+  description: "CPI-U year-over-year inflation nowcasting at 1-month horizon (completed month, pre-release)"
+  version: "1.0"
+  created: "2024-10-12"
+
+target:
+  series_id: "CPIAUCNS"
+  frequency: "monthly"
+  definition: "year-over-year percent change, not seasonally adjusted"
+  units: "percent"
+
+forecast:
+  task: "nowcast"
+  horizon_description: "completed target month, pre-official-release"
+  origins_start: "2018-01-31"
+  origins_end: "2024-06-30"
+  origins_frequency: "monthly"
+  proposed_total_origins: 78
+
+baseline:
+  method: "random_walk_yoy"
+  description: "previous month's year-over-year inflation rate"
+
+conditions:
+  A:
+    name: "pre_release_information_only"
+    description: "historical CPI through month M-1 only; target month M is complete but not yet released"
+  B:
+    name: "post_origin_economic_context"
+    description: "Condition A plus pre-specified economic indicators released after origin but before/at target release"
+    indicators:
+      - "federal_reserve_policy"
+      - "employment_data"
+      - "producer_prices"
+      - "crude_oil_price_eod_target_month"
+  C:
+    name: "positive_control_direct_disclosure"
+    description: "Condition A plus explicit target value; used for calibration only, not accuracy scoring"
+
+model:
+  provider: "mock"
+  model_id: "mock_v1"
+  config:
+    temperature: 0.0
+    max_tokens: 50
+
+data:
+  source: "FRED/ALFRED API"
+  vintage_policy: "original release; no revisions unless explicitly noted"
+  series_id: "CPIAUCNS"
+
+metrics:
+  primary:
+    - "mae"
+    - "rmse"
+    - "revision"
+  secondary:
+    - "bias"
+    - "directional_accuracy"
+
+output:
+  log_format: "jsonl"
+  log_path: "results/forecast_log.jsonl"
+  summary_path: "results/pilot_summary.csv"
+  sample_audit_path: "results/sample_audit.txt"
+
+git:
+  commit: "[set at runtime]"
+
+sample:
+  origins_start: "2018-01-31"
+  origins_end: "2024-06-30"
+  frequency: "monthly"
+  proposed_total_origins: 78
+  verification_status: "pending"
+  verification_completed_date: null
+  excluded_origins: []
+  regimes:
+    stable_growth:
+      start: "2018-01-31"
+      end: "2019-12-31"
+      count: 24
+    pandemic:
+      start: "2020-01-31"
+      end: "2021-12-31"
+      count: 24
+    inflation_surge:
+      start: "2022-01-31"
+      end: "2023-06-30"
+      count: 18
+    stabilization:
+      start: "2023-07-31"
+      end: "2024-06-30"
+      count: 12
