@@ -1,0 +1,39 @@
+# Secrets and environment
+.env
+.env.local
+*.key
+*.pem
+secrets/
+
+# Data (raw FRED/ALFRED downloads)
+data/raw/
+data/*.csv
+data/*.json
+
+# Generated artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+*.tmp
+.coverage
+
+# Large result files
+results/*.pkl
+results/*.parquet
+
+# IDE and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Model cache
+.cache/
+models/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
